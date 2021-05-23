@@ -8,29 +8,50 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var firstUnit: Unit = .m
-    @State private var secondUnit: Unit = .m
-    @State private var number: Double = 10
-    var result: Double = 0
+    @State private var firstUnit = Unit.km.rawValue
+    @State private var secondUnit = Unit.m.rawValue
+    @State private var number = ""
+    var result: Double {
+        let unitOne = Unit(rawValue: firstUnit)
+        let unitTwo = Unit(rawValue: secondUnit)
+        let length = Double(number) ?? 0
+        
+        return length * unitConvertor(first: unitOne!, second: unitTwo!)
+    }
     
     
     var body: some View {
-        Form {
-            Section {
-                Text("input picker")
+        NavigationView {
+            Form {
+                Section(header: Text("Choose first unit")) {
+                    Picker("Choose first unit", selection: $firstUnit) {
+                        ForEach(Unit.allCases) { unit in
+                            Text("\(unit.rawValue)")
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                Section(header: Text("Choose second unit")) {
+                    Picker("Choose first unit", selection: $secondUnit) {
+                        ForEach(Unit.allCases) { unit in
+                            Text("\(unit.rawValue)")
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                
+                Section {
+                    TextField("Enter number", text: $number)
+                        .keyboardType(.decimalPad)
+                }
+                
+                Section {
+                    Text("Result of conversion is: \(result)")
+                }
             }
-            
-            Section {
-                Text("Output picker")
-            }
-            
-            Section {
-            Text("Text field")
-            }
-            
-            Section {
-                Text("\(result)")
-            }
+            .navigationTitle("Length Converter")
         }
     }
 }
@@ -41,12 +62,14 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-enum Unit {
+enum Unit: String, CaseIterable, Identifiable {
+    
     case m
     case km
     case feet
     case yards
     case miles
+    var id: String { self.rawValue }
 }
 
 func unitConvertor(first: Unit, second: Unit) -> Double {
